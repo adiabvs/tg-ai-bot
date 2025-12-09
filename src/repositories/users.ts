@@ -10,6 +10,7 @@ export type UserDoc = {
   phoneNumber?: string;
   telegramId?: number;
   sharedAt?: FieldValue | Timestamp;
+  startedAt?: FieldValue | Timestamp;
 };
 
 async function saveUser(userId: number, data: UserDoc): Promise<void> {

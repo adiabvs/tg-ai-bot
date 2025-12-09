@@ -4,6 +4,9 @@ import { handleContact } from './handlers/contact';
 import { handleMessage, handleNewConversation } from './handlers/chat';
 import { requestContactKeyboard } from './keyboards';
 import { logEvent } from './repositories/conversations';
+import { saveUser } from './repositories/users';
+import { saveStart } from './repositories/starts';
+import { admin } from './services/firebase';
 
 const bot = new Telegraf(config.botToken);
 
@@ -13,6 +16,21 @@ bot.start((ctx) => {
     `Hi ${name}! I'm an AI doctor to help you understand medicine terms. Chats are private. Please share your phone number to start (required).`,
     requestContactKeyboard,
   );
+  if (ctx.from) {
+    saveStart(ctx.from.id, {
+      name: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(' ') || undefined,
+      username: ctx.from.username || undefined,
+      languageCode: ctx.from.language_code || undefined,
+      chatId: ctx.chat?.id,
+      source: ctx.startPayload,
+    }).catch((err) => console.error('Failed to save start record', err));
+    saveUser(ctx.from.id, {
+      name: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(' ') || undefined,
+      username: ctx.from.username || undefined,
+      telegramId: ctx.from.id,
+      startedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }).catch((err) => console.error('Failed to save user on start', err));
+  }
   logEvent({
     chatId: ctx.chat.id,
     userId: ctx.from.id,

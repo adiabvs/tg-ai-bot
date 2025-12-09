@@ -3,7 +3,7 @@ import config from '../config';
 
 // Use the fully qualified model path to avoid API version mismatches.
 const genAI = new GoogleGenerativeAI(config.geminiApiKey);
-const model = genAI.getGenerativeModel({ model: 'models/gemini-1.5-flash' });
+const model = genAI.getGenerativeModel({ model: config.geminiModel });
 
 /**
  * Generate a reply based on conversation history and the latest user message.

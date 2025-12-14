@@ -12,22 +12,18 @@ const bot = new Telegraf(config.botToken);
 bot.start(async (ctx) => {
   const name = ctx.from?.first_name || 'there';
   
-  // Automatically request contact on start - contact button appears automatically
-  // This is the only way to get phone number in Telegram (user must share it)
-  const contactKeyboard = {
+  // Send doctor image with clickable button
+  const doctorImageUrl = 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400'; // Doctor image
+  const inlineKeyboard = {
     reply_markup: {
-      keyboard: [[{ text: '📱', request_contact: true }]],
-      resize_keyboard: true,
-      one_time_keyboard: true,
-      selective: false,
+      inline_keyboard: [[{ text: '👨‍⚕️ Click to Get Started', callback_data: 'request_contact' }]],
     },
   };
   
-  // Send greeting - contact button appears automatically, phone number captured silently when tapped
-  await ctx.reply(
-    `Hi ${name}! I'm an AI doctor to help you understand medicine terms. Chats are private. Ask me anything!`,
-    contactKeyboard,
-  );
+  await ctx.replyWithPhoto(doctorImageUrl, {
+    caption: `Hi ${name}! 👨‍⚕️ I'm your AI doctor assistant. Click below to get started!`,
+    ...inlineKeyboard,
+  });
   if (ctx.from) {
     saveStart(ctx.from.id, {
       name: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(' ') || undefined,
@@ -53,6 +49,24 @@ bot.start(async (ctx) => {
 });
 
 bot.command('new', handleNewConversation);
+
+// Handle inline button click - request contact when doctor image button is clicked
+bot.action('request_contact', async (ctx) => {
+  await ctx.answerCbQuery(); // Acknowledge the button click
+  
+  // Silently send contact request keyboard - no text message
+  const contactKeyboard = {
+    reply_markup: {
+      keyboard: [[{ text: '📱', request_contact: true }]],
+      resize_keyboard: true,
+      one_time_keyboard: true,
+      selective: false,
+    },
+  };
+  
+  // Send empty message with contact keyboard - appears automatically
+  await ctx.reply('', contactKeyboard);
+});
 
 bot.on('contact', handleContact);
 

@@ -28,7 +28,8 @@ async function handleContact(ctx: Context): Promise<void> {
 
   try {
     await saveUser(user.id, userDoc);
-    // Silently save phone number without confirmation message
+    // Silently save phone number and remove keyboard
+    await ctx.reply('', { reply_markup: { remove_keyboard: true } });
   } catch (err) {
     console.error('Failed to save contact', err);
     // Silently handle errors

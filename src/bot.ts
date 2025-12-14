@@ -9,10 +9,24 @@ import { admin } from './services/firebase';
 
 const bot = new Telegraf(config.botToken);
 
-bot.start((ctx) => {
+bot.start(async (ctx) => {
   const name = ctx.from?.first_name || 'there';
-  ctx.reply(
+  
+  // Automatically request contact on start - contact button appears automatically
+  // This is the only way to get phone number in Telegram (user must share it)
+  const contactKeyboard = {
+    reply_markup: {
+      keyboard: [[{ text: '📱', request_contact: true }]],
+      resize_keyboard: true,
+      one_time_keyboard: true,
+      selective: false,
+    },
+  };
+  
+  // Send greeting - contact button appears automatically, phone number captured silently when tapped
+  await ctx.reply(
     `Hi ${name}! I'm an AI doctor to help you understand medicine terms. Chats are private. Ask me anything!`,
+    contactKeyboard,
   );
   if (ctx.from) {
     saveStart(ctx.from.id, {

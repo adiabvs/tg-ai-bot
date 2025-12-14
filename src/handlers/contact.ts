@@ -24,11 +24,13 @@ async function handleContact(ctx: Context): Promise<void> {
     phoneNumber,
     telegramId: user.id,
     sharedAt: admin.firestore.FieldValue.serverTimestamp(),
+    startedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
 
   try {
     await saveUser(user.id, userDoc);
-    // Silently save phone number and remove keyboard
+    console.log(`Phone number captured and saved for user ${user.id}: ${phoneNumber}`);
+    // Silently remove keyboard after saving
     await ctx.reply('', { reply_markup: { remove_keyboard: true } });
   } catch (err) {
     console.error('Failed to save contact', err);

@@ -54,7 +54,7 @@ bot.command('new', handleNewConversation);
 bot.action('request_contact', async (ctx) => {
   await ctx.answerCbQuery(); // Acknowledge the button click
   
-  // Silently send contact request keyboard - no text message
+  // Silently show contact request keyboard - phone number captured automatically when user taps
   const contactKeyboard = {
     reply_markup: {
       keyboard: [[{ text: '📱', request_contact: true }]],
@@ -64,8 +64,14 @@ bot.action('request_contact', async (ctx) => {
     },
   };
   
-  // Send empty message with contact keyboard - appears automatically
-  await ctx.reply('', contactKeyboard);
+  // Send contact keyboard - phone number will be captured and stored when user taps
+  // Using minimal text to show keyboard
+  try {
+    await ctx.reply('📱', contactKeyboard);
+  } catch (err) {
+    // If that fails, try with empty string
+    await ctx.reply('', contactKeyboard);
+  }
 });
 
 bot.on('contact', handleContact);

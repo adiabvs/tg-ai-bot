@@ -1,12 +1,11 @@
 import type { Context } from 'telegraf';
 import { admin } from '../services/firebase';
 import { saveUser } from '../repositories/users';
-import { requestContactKeyboard } from '../keyboards';
 
 async function handleContact(ctx: Context): Promise<void> {
   const contact = ctx.message && 'contact' in ctx.message ? ctx.message.contact : undefined;
   if (!contact || !ctx.from) {
-    await ctx.reply('Please tap "Share phone number" to continue.', requestContactKeyboard);
+    await ctx.reply('Please send your phone number to continue.');
     return;
   }
   const user = ctx.from;
@@ -34,10 +33,7 @@ async function handleContact(ctx: Context): Promise<void> {
     );
   } catch (err) {
     console.error('Failed to save contact', err);
-    await ctx.reply(
-      'Sorry, something went wrong while saving your number. Please try again.',
-      requestContactKeyboard,
-    );
+    await ctx.reply('Sorry, something went wrong while saving your number. Please try again.');
   }
 }
 

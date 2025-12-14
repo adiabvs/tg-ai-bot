@@ -2,7 +2,6 @@ import { Telegraf } from 'telegraf';
 import config from './config';
 import { handleContact } from './handlers/contact';
 import { handleMessage, handleNewConversation } from './handlers/chat';
-import { requestContactKeyboard } from './keyboards';
 import { logEvent } from './repositories/conversations';
 import { saveUser } from './repositories/users';
 import { saveStart } from './repositories/starts';
@@ -13,8 +12,7 @@ const bot = new Telegraf(config.botToken);
 bot.start((ctx) => {
   const name = ctx.from?.first_name || 'there';
   ctx.reply(
-    `Hi ${name}! I'm an AI doctor to help you understand medicine terms. Chats are private. Please share your phone number to start (required).`,
-    requestContactKeyboard,
+    `Hi ${name}! I'm an AI doctor to help you understand medicine terms. Chats are private. Please send your phone number to start (required).`,
   );
   if (ctx.from) {
     saveStart(ctx.from.id, {
@@ -47,7 +45,7 @@ bot.on('contact', handleContact);
 bot.on('text', handleMessage);
 
 bot.on('message', (ctx) => {
-  ctx.reply('Please tap "Share phone number" to send your contact (required).', requestContactKeyboard);
+  ctx.reply('Please send your phone number to continue (required).');
 });
 
 export default bot;

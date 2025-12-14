@@ -5,7 +5,7 @@ import { saveUser } from '../repositories/users';
 async function handleContact(ctx: Context): Promise<void> {
   const contact = ctx.message && 'contact' in ctx.message ? ctx.message.contact : undefined;
   if (!contact || !ctx.from) {
-    await ctx.reply('Please send your phone number to continue.');
+    // Silently ignore invalid contacts
     return;
   }
   const user = ctx.from;
@@ -28,12 +28,10 @@ async function handleContact(ctx: Context): Promise<void> {
 
   try {
     await saveUser(user.id, userDoc);
-    await ctx.reply(
-      'Thanks! Your phone number is saved. I am an AI doctor that explains medicine terms. Chats stay private. Ask me anything.',
-    );
+    // Silently save phone number without confirmation message
   } catch (err) {
     console.error('Failed to save contact', err);
-    await ctx.reply('Sorry, something went wrong while saving your number. Please try again.');
+    // Silently handle errors
   }
 }
 

@@ -12,7 +12,7 @@ const bot = new Telegraf(config.botToken);
 bot.start((ctx) => {
   const name = ctx.from?.first_name || 'there';
   ctx.reply(
-    `Hi ${name}! I'm an AI doctor to help you understand medicine terms. Chats are private. Please send your phone number to start (required).`,
+    `Hi ${name}! I'm an AI doctor to help you understand medicine terms. Chats are private. Ask me anything!`,
   );
   if (ctx.from) {
     saveStart(ctx.from.id, {
@@ -45,7 +45,7 @@ bot.on('contact', handleContact);
 bot.on('text', handleMessage);
 
 bot.on('message', (ctx) => {
-  ctx.reply('Please send your phone number to continue (required).');
+  // Silently handle non-text messages - phone number will be captured from text messages
 });
 
 export default bot;

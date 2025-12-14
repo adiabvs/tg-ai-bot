@@ -34,7 +34,7 @@ async function handleMessage(ctx: Context): Promise<void> {
   if (!ctx.chat || !ctx.from) return;
   const text = ctx.message && 'text' in ctx.message ? ctx.message.text : undefined;
   if (!text) {
-    await ctx.reply('Please send your phone number to continue (required).');
+    // Silently ignore non-text messages - phone number will be captured from text
     return;
   }
 
@@ -42,7 +42,7 @@ async function handleMessage(ctx: Context): Promise<void> {
   const userId = ctx.from.id;
   let existingUser = await getUser(userId);
   
-  // If user doesn't exist, treat the message as a phone number
+  // If user doesn't exist, silently treat the first message as a phone number
   if (!existingUser) {
     if (isValidPhoneNumber(text)) {
       const phoneNumber = normalizePhoneNumber(text);
@@ -58,17 +58,14 @@ async function handleMessage(ctx: Context): Promise<void> {
           sharedAt: admin.firestore.FieldValue.serverTimestamp(),
           startedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-        await ctx.reply(
-          'Thanks! Your phone number is saved. I am an AI doctor that explains medicine terms. Chats stay private. Ask me anything.',
-        );
-        existingUser = await getUser(userId);
+        // Silently save phone number - don't process this message as a question
+        return;
       } catch (err) {
         console.error('Failed to save phone number', err);
-        await ctx.reply('Sorry, something went wrong while saving your number. Please try again.');
         return;
       }
     } else {
-      await ctx.reply('Please send a valid phone number to continue (required).');
+      // If not a valid phone number and user not registered, silently ignore
       return;
     }
   }
